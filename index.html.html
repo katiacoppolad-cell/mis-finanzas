@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f0f0f">
+<title>Mis Finanzas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--border:#2e2e2e;
+  --text:#f0ece4;--muted:#777;--accent:#c8f060;--accent2:#f0c060;
+  --danger:#f06060;--success:#60d0a0;--r:14px;--rs:10px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;overflow-x:hidden;}
+.serif{font-family:'DM Serif Display',serif;}
+.page{display:none;padding-bottom:80px;min-height:100vh;}
+.page.active{display:block;}
+.header{padding:52px 20px 20px;background:var(--bg);}
+.h-label{font-size:11px;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.h-amount{font-size:40px;font-family:'DM Serif Display',serif;line-height:1.1;}
+.h-amount.pos{color:var(--accent);}
+.h-amount.neg{color:var(--danger);}
+.h-sub{font-size:13px;color:var(--muted);margin-top:5px;}
+.chips{display:flex;gap:8px;padding:4px 20px 18px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:7px 14px;border-radius:99px;font-size:13px;white-space:nowrap;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all .15s;}
+.chip.active{background:var(--accent);color:#0f0f0f;border-color:var(--accent);font-weight:500;}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;margin-bottom:22px;}
+.mc{background:var(--bg2);border-radius:var(--rs);border:1px solid var(--border);padding:14px;}
+.mc-label{font-size:11px;color:var(--muted);margin-bottom:5px;}
+.mc-val{font-size:19px;font-family:'DM Serif Display',serif;}
+.mc-val.pos{color:var(--accent);}
+.mc-val.neg{color:var(--danger);}
+.sec{padding:0 20px;margin-bottom:22px;}
+.sec-title{font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+.card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin-bottom:10px;}
+.crow{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--border);}
+.crow:last-child{border-bottom:none;}
+.crow-l{display:flex;align-items:center;gap:11px;flex:1;min-width:0;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.crow-name{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.crow-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.crow-amt{font-size:14px;font-weight:500;white-space:nowrap;margin-left:8px;}
+.crow-amt.inc{color:var(--accent);}
+.crow-amt.exp{color:var(--danger);}
+.del-btn{background:none;border:none;color:var(--muted);font-size:20px;line-height:1;padding:2px 0 2px 10px;cursor:pointer;flex-shrink:0;}
+.del-btn:active{color:var(--danger);}
+.empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:13px;}
+.prog-wrap{padding:0 20px;margin-bottom:22px;}
+.prog-bar-bg{background:var(--bg3);border-radius:99px;height:6px;margin:8px 0 5px;overflow:hidden;}
+.prog-bar-fill{height:100%;border-radius:99px;transition:width .4s;}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+.meta-card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);padding:18px;margin:0 20px 16px;}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.mrow:last-child{border-bottom:none;}
+.mrow-label{color:var(--muted);}
+.badge{font-size:11px;padding:4px 10px;border-radius:99px;font-weight:500;}
+.badge.ok{background:rgba(96,208,160,.15);color:var(--success);}
+.badge.warn{background:rgba(240,192,96,.15);color:var(--accent2);}
+.badge.bad{background:rgba(240,96,96,.15);color:var(--danger);}
+.scard{background:var(--bg2);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;margin:0 20px 14px;}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;border-bottom:1px solid var(--border);}
+.srow:last-child{border-bottom:none;}
+.slabel{font-size:14px;}
+.ssub{font-size:12px;color:var(--muted);}
+.sinput{background:transparent;border:none;color:var(--accent);font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;text-align:right;width:150px;}
+.sinput:focus{outline:none;}
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px);}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;cursor:pointer;}
+.nbtn.active{color:var(--accent);}
+.nicon{font-size:18px;line-height:1;}
+.fab{position:fixed;bottom:74px;right:18px;width:50px;height:50px;border-radius:50%;background:var(--accent);border:none;color:#0f0f0f;font-size:28px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 16px rgba(200,240,96,.25);z-index:99;}
+.fab:active{transform:scale(.93);}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:flex-end;-webkit-align-items:flex-end;}
+.mbg.open{display:flex;}
+.modal{background:var(--bg2);border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));width:100%;border-top:1px solid var(--border);}
+.modal-title{font-size:18px;font-family:'DM Serif Display',serif;margin-bottom:18px;}
+.tgroup{display:flex;background:var(--bg3);border-radius:var(--rs);padding:3px;margin-bottom:15px;}
+.topt{flex:1;padding:8px 4px;text-align:center;border-radius:8px;font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s;}
+.topt.active{background:var(--bg2);color:var(--text);font-weight:500;}
+.mfield{margin-bottom:14px;}
+.mlabel{font-size:12px;color:var(--muted);margin-bottom:5px;}
+.minput{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:12px 13px;color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;-webkit-appearance:none;appearance:none;}
+.minput:focus{outline:none;border-color:#555;}
+.mactions{display:flex;gap:10px;margin-top:4px;}
+.bprim{flex:1;background:var(--accent);color:#0f0f0f;border:none;border-radius:var(--rs);padding:14px;font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;}
+.bsec{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:var(--rs);padding:14px 18px;font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="page active" id="pg-home"></div>
+<div class="page" id="pg-reg"></div>
+<div class="page" id="pg-meta"></div>
+<div class="page" id="pg-cfg"></div>
+
+<button class="fab" id="fab" aria-label="Agregar">+</button>
+
+<nav class="nav">
+  <button class="nbtn active" id="nb-home"><span class="nicon">◈</span>Inicio</button>
+  <button class="nbtn" id="nb-reg"><span class="nicon">≡</span>Registro</button>
+  <button class="nbtn" id="nb-meta"><span class="nicon">◎</span>Meta</button>
+  <button class="nbtn" id="nb-cfg"><span class="nicon">⊙</span>Config</button>
+</nav>
+
+<div class="mbg" id="mbg">
+  <div class="modal">
+    <div class="modal-title">Nuevo movimiento</div>
+    <div class="tgroup">
+      <div class="topt active" id="t-ing">💸 Ingreso</div>
+      <div class="topt" id="t-neg">🏢 Negocio</div>
+      <div class="topt" id="t-per">🏠 Personal</div>
+    </div>
+    <div id="serv-fields">
+      <div class="mfield">
+        <div class="mlabel">Tipo de servicio</div>
+        <select class="minput" id="m-serv">
+          <option value="keratina">Tratamiento anti frizz — $68.000</option>
+          <option value="japones">Alisado japonés — $85.000</option>
+          <option value="sinformol">Extra sin formol — $18.000</option>
+          <option value="otro">Otro monto</option>
+        </select>
+      </div>
+      <div class="mfield">
+        <div class="mlabel">Modalidad</div>
+        <select class="minput" id="m-mod">
+          <option value="casa">En casa</option>
+          <option value="dom">A domicilio (+$15.000)</option>
+        </select>
+      </div>
+      <div class="mfield">
+        <div class="mlabel">Adicionales</div>
+        <div id="adicionales" style="display:flex;flex-direction:column;gap:8px;margin-top:2px;">
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="ad-noc" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;"> Nocturno <span style="color:var(--muted);font-size:12px;margin-left:auto">+$18.000</span></label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="ad-dom" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;"> Domingo <span style="color:var(--muted);font-size:12px;margin-left:auto">+$15.000</span></label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="ad-ex1" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;"> Extra cantidad 1 <span style="color:var(--muted);font-size:12px;margin-left:auto">+$10.000</span></label>
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;"><input type="checkbox" id="ad-ex2" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;"> Extra cantidad 2 <span style="color:var(--muted);font-size:12px;margin-left:auto">+$20.000</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="mfield">
+      <div class="mlabel" id="m-plabel">Monto</div>
+      <input class="minput" type="number" id="m-precio" inputmode="numeric" placeholder="0">
+    </div>
+    <div class="mfield" id="desc-field" style="display:none">
+      <div class="mlabel">Descripción</div>
+      <input class="minput" type="text" id="m-desc" placeholder="ej: Alquiler, productos...">
+    </div>
+    <div class="mactions">
+      <button class="bsec" id="btn-cancel">Cancelar</button>
+      <button class="bprim" id="btn-save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var PRECIOS={keratina:68000,botox:68000,japones:85000,sinformol:18000,dom:15000,nocturno:18000,domingo:15000,extra1:10000,extra2:20000,otro:0};
+var MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var movs=[];
+var metaMonto=2000000;
+var tipoModal='ing';
+var filtroMes=new Date().getMonth();
+var filtroAnio=new Date().getFullYear();
+
+function fmt(n){return '$'+Math.round(Math.abs(n)).toLocaleString('es-AR');}
+
+// storage con fallback
+function saveData(){
+  try{localStorage.setItem('mv',JSON.stringify(movs));localStorage.setItem('meta',metaMonto);localStorage.setItem('precios',JSON.stringify(PRECIOS));}catch(e){}
+}
+function loadData(){
+  try{
+    var m=localStorage.getItem('mv');if(m)movs=JSON.parse(m);
+    var mt=localStorage.getItem('meta');if(mt)metaMonto=parseFloat(mt)||2000000;
+    var pr=localStorage.getItem('precios');if(pr){var p=JSON.parse(pr);PRECIOS.keratina=p.keratina||68000;PRECIOS.botox=p.botox||68000;PRECIOS.japones=p.japones||85000;PRECIOS.sinformol=p.sinformol||18000;PRECIOS.dom=p.dom||15000;PRECIOS.nocturno=p.nocturno||18000;PRECIOS.domingo=p.domingo||15000;PRECIOS.extra1=p.extra1||10000;PRECIOS.extra2=p.extra2||20000;}
+  }catch(e){}
+}
+
+// NAV
+function goTo(id){
+  ['home','reg','meta','cfg'].forEach(function(p){
+    document.getElementById('pg-'+p).classList.remove('active');
+    document.getElementById('nb-'+p).classList.remove('active');
+  });
+  document.getElementById('pg-'+id).classList.add('active');
+  document.getElementById('nb-'+id).classList.add('active');
+  document.getElementById('fab').style.display=(id==='meta'||id==='cfg')?'none':'flex';
+  renderAll();
+}
+document.getElementById('nb-home').onclick=function(){goTo('home');};
+document.getElementById('nb-reg').onclick=function(){goTo('reg');};
+document.getElementById('nb-meta').onclick=function(){goTo('meta');};
+document.getElementById('nb-cfg').onclick=function(){goTo('cfg');};
+
+// MODAL
+function setTipo(t){
+  tipoModal=t;
+  ['ing','neg','per'].forEach(function(x){document.getElementById('t-'+x).classList.remove('active');});
+  document.getElementById('t-'+t).classList.add('active');
+  var isIng=t==='ing';
+  document.getElementById('serv-fields').style.display=isIng?'block':'none';
+  document.getElementById('desc-field').style.display=isIng?'none':'block';
+  document.getElementById('m-plabel').textContent=isIng?'Monto (automático)':'Monto ($)';
+  if(isIng)updPrecio(); else document.getElementById('m-precio').value='';
+}
+document.getElementById('t-ing').onclick=function(){setTipo('ing');};
+document.getElementById('t-neg').onclick=function(){setTipo('neg');};
+document.getElementById('t-per').onclick=function(){setTipo('per');};
+
+function getAdicionales(){
+  var sum=0;var tags=[];
+  if(document.getElementById('ad-noc').checked){sum+=PRECIOS.nocturno;tags.push('nocturno');}
+  if(document.getElementById('ad-dom').checked){sum+=PRECIOS.domingo;tags.push('domingo');}
+  if(document.getElementById('ad-ex1').checked){sum+=PRECIOS.extra1;tags.push('extra×1');}
+  if(document.getElementById('ad-ex2').checked){sum+=PRECIOS.extra2;tags.push('extra×2');}
+  return{sum:sum,tags:tags};
+}
+function updPrecio(){
+  var s=document.getElementById('m-serv').value;
+  var md=document.getElementById('m-mod').value;
+  if(s==='otro'){document.getElementById('m-precio').value='';return;}
+  var base=PRECIOS[s]+(md==='dom'?PRECIOS.dom:0);
+  document.getElementById('m-precio').value=base+getAdicionales().sum;
+}
+document.getElementById('m-serv').onchange=updPrecio;
+document.getElementById('m-mod').onchange=updPrecio;
+['ad-noc','ad-dom','ad-ex1','ad-ex2'].forEach(function(id){document.getElementById(id).onchange=updPrecio;});
+
+document.getElementById('fab').onclick=function(){
+  tipoModal='ing';
+  ['ing','neg','per'].forEach(function(x){document.getElementById('t-'+x).classList.remove('active');});
+  document.getElementById('t-ing').classList.add('active');
+  document.getElementById('serv-fields').style.display='block';
+  document.getElementById('desc-field').style.display='none';
+  document.getElementById('m-serv').value='keratina';
+  document.getElementById('m-mod').value='casa';
+  document.getElementById('m-desc').value='';
+  ['ad-noc','ad-dom','ad-ex1','ad-ex2'].forEach(function(id){document.getElementById(id).checked=false;});
+  updPrecio();
+  document.getElementById('mbg').classList.add('open');
+};
+document.getElementById('btn-cancel').onclick=function(){document.getElementById('mbg').classList.remove('open');};
+document.getElementById('mbg').onclick=function(e){if(e.target===this)this.classList.remove('open');};
+
+document.getElementById('btn-save').onclick=function(){
+  var precio=parseFloat(document.getElementById('m-precio').value)||0;
+  if(!precio){alert('Ingresá un monto');return;}
+  var now=new Date();
+  var serv=document.getElementById('m-serv');
+  var mod=document.getElementById('m-mod').value;
+  var desc=tipoModal==='ing'
+    ?(function(){var serv2=document.getElementById('m-serv');var mod2=document.getElementById('m-mod').value;var ad=getAdicionales();var base=serv2.options[serv2.selectedIndex].text.split('—')[0].trim();var parts=[mod2==='dom'?'domicilio':'en casa'];if(ad.tags.length)parts=parts.concat(ad.tags);return base+' · '+parts.join(', ');})()
+    :(document.getElementById('m-desc').value||(tipoModal==='neg'?'Gasto negocio':'Gasto personal'));
+  movs.unshift({id:Date.now(),tipo:tipoModal,monto:precio,mes:now.getMonth(),anio:now.getFullYear(),fecha:now.toLocaleDateString('es-AR'),desc:desc});
+  saveData();
+  document.getElementById('mbg').classList.remove('open');
+  renderAll();
+};
+
+function getMovs(mes,anio){return movs.filter(function(m){return m.mes===mes&&m.anio===anio;});}
+function calcRes(arr){
+  var ing=0,gn=0,gp=0;
+  arr.forEach(function(m){if(m.tipo==='ing')ing+=m.monto;else if(m.tipo==='neg')gn+=m.monto;else gp+=m.monto;});
+  return{ing:ing,gn:gn,gp:gp,neto:ing-gn-gp};
+}
+function delMov(id){if(confirm('¿Eliminar?')){movs=movs.filter(function(m){return m.id!==id;});saveData();renderAll();}}
+
+function chipsHTML(){
+  var h='';
+  for(var i=0;i<6;i++){
+    var m=(new Date().getMonth()-i+12)%12;
+    var a=m>new Date().getMonth()?new Date().getFullYear()-1:new Date().getFullYear();
+    var act=(m===filtroMes&&a===filtroAnio)?'active':'';
+    h+='<button class="chip '+act+'" data-m="'+m+'" data-a="'+a+'">'+MESES[m].substring(0,3)+'</button>';
+  }
+  return h;
+}
+function bindChips(el){
+  el.querySelectorAll('.chip').forEach(function(c){
+    c.onclick=function(){filtroMes=parseInt(this.dataset.m);filtroAnio=parseInt(this.dataset.a);renderAll();};
+  });
+}
+
+function rowHTML(m){
+  var col=m.tipo==='ing'?'#c8f060':m.tipo==='neg'?'#f06060':'#f0c060';
+  var aclass=m.tipo==='ing'?'inc':'exp';
+  var sign=m.tipo==='ing'?'+':'-';
+  return '<div class="crow"><div class="crow-l"><div class="dot" style="background:'+col+'"></div><div><div class="crow-name">'+m.desc+'</div><div class="crow-sub">'+m.fecha+'</div></div></div><div style="display:flex;align-items:center"><span class="crow-amt '+aclass+'">'+sign+fmt(m.monto)+'</span><button class="del-btn" data-id="'+m.id+'">×</button></div></div>';
+}
+function bindDel(el){
+  el.querySelectorAll('.del-btn').forEach(function(b){b.onclick=function(){delMov(parseInt(this.dataset.id));};});
+}
+
+function renderAll(){renderHome();renderReg();renderMeta();renderCfg();}
+
+function renderHome(){
+  var arr=getMovs(filtroMes,filtroAnio);
+  var r=calcRes(arr);
+  var ul=arr.slice(0,5);
+  var rowsH=ul.length?ul.map(rowHTML).join(''):'<div class="empty">Sin movimientos este mes</div>';
+  var el=document.getElementById('pg-home');
+  el.innerHTML='<div class="header"><div class="h-label">Resultado neto — '+MESES[filtroMes]+'</div><div class="h-amount '+(r.neto>=0?'pos':'neg')+' serif">'+fmt(r.neto)+'</div><div class="h-sub">Ingresos '+fmt(r.ing)+' · Gastos '+fmt(r.gn+r.gp)+'</div></div><div class="chips" id="ch-home">'+chipsHTML()+'</div><div class="mgrid"><div class="mc"><div class="mc-label">Ingresos</div><div class="mc-val pos">'+fmt(r.ing)+'</div></div><div class="mc"><div class="mc-label">Gasto negocio</div><div class="mc-val neg">'+fmt(r.gn)+'</div></div><div class="mc"><div class="mc-label">Gasto personal</div><div class="mc-val neg">'+fmt(r.gp)+'</div></div><div class="mc"><div class="mc-label">Disponible</div><div class="mc-val '+(r.neto>=0?'pos':'neg')+'">'+fmt(r.neto)+'</div></div></div><div class="sec"><div class="sec-title">Últimos movimientos</div><div class="card" id="ul-home">'+rowsH+'</div></div>';
+  bindChips(el);bindDel(el);
+}
+
+function renderReg(){
+  var arr=getMovs(filtroMes,filtroAnio);
+  var ings=arr.filter(function(m){return m.tipo==='ing';});
+  var negs=arr.filter(function(m){return m.tipo==='neg';});
+  var pers=arr.filter(function(m){return m.tipo==='per';});
+  function lista(a,t){
+    if(!a.length)return '<div class="empty">Sin registros</div>';
+    return '<div class="card">'+a.map(rowHTML).join('')+'</div>';
+  }
+  var el=document.getElementById('pg-reg');
+  el.innerHTML='<div class="header"><div class="h-label">'+MESES[filtroMes]+' '+filtroAnio+'</div><div style="font-size:13px;color:var(--muted);margin-top:4px;">'+arr.length+' movimiento'+(arr.length!==1?'s':'')+'</div></div><div class="chips" id="ch-reg">'+chipsHTML()+'</div><div class="sec"><div class="sec-title">Servicios / ingresos</div>'+lista(ings,'ing')+'</div><div class="sec"><div class="sec-title">Gastos del negocio</div>'+lista(negs,'neg')+'</div><div class="sec"><div class="sec-title">Gastos personales</div>'+lista(pers,'per')+'</div>';
+  bindChips(el);bindDel(el);
+}
+
+function renderMeta(){
+  var mRest=11-new Date().getMonth();
+  var tot=0,cnt=0;
+  for(var i=0;i<3;i++){
+    var m=(new Date().getMonth()-i+12)%12;
+    var a=m>new Date().getMonth()?new Date().getFullYear()-1:new Date().getFullYear();
+    var arr=getMovs(m,a);
+    if(arr.length){tot+=calcRes(arr).neto;cnt++;}
+  }
+  var prom=cnt?Math.round(tot/cnt):0;
+  var proy=prom*mRest;
+  var pct=Math.min(100,Math.round((proy/metaMonto)*100));
+  var bcolor=pct>=80?'var(--accent)':pct>=50?'var(--accent2)':'var(--danger)';
+  var badge,bc;
+  if(proy>=metaMonto){badge='¡Llegás! ✓';bc='ok';}
+  else if(proy>=metaMonto*.7){badge='Cerca, falta poco';bc='warn';}
+  else{badge='Necesitás ajustar';bc='bad';}
+  document.getElementById('pg-meta').innerHTML='<div class="header"><div class="h-label">Meta — depto apto profesional</div><div class="h-amount '+(proy>=metaMonto?'pos':'neg')+' serif">'+fmt(metaMonto)+'</div><div class="h-sub">Objetivo para fin de año</div></div><div class="prog-wrap"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span>Proyección vs meta</span><span>'+pct+'%</span></div><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:'+pct+'%;background:'+bcolor+'"></div></div><div class="prog-labels"><span>$0</span><span>'+fmt(metaMonto)+'</span></div></div><div class="meta-card"><div class="mrow"><span class="mrow-label">Meses restantes</span><span>'+mRest+'</span></div><div class="mrow"><span class="mrow-label">Neto promedio (3 meses)</span><span style="color:var(--accent)">'+(prom?fmt(prom):'Sin datos aún')+'</span></div><div class="mrow"><span class="mrow-label">Proyección acumulada</span><span>'+(proy?fmt(proy):'—')+'</span></div><div class="mrow"><span class="mrow-label">¿Alcanzás?</span><span class="badge '+bc+'">'+badge+'</span></div></div><div style="padding:0 20px;font-size:13px;color:var(--muted);line-height:1.6;">'+(cnt?'Proyección en base a tu promedio real de los últimos meses.':'Registrá movimientos para ver la proyección.')+'</div>';
+}
+
+function renderCfg(){
+  document.getElementById('pg-cfg').innerHTML='<div class="header"><div class="h-label">Configuración</div><div style="font-size:22px;font-family:\'DM Serif Display\',serif;margin-top:4px;">Mis datos</div></div><div class="sec-title" style="padding:16px 20px 10px">Meta del local</div><div class="scard"><div class="srow"><div><div class="slabel">Monto objetivo</div><div class="ssub">Primer mes + depósito</div></div><input class="sinput" type="number" id="cfg-meta" value="'+metaMonto+'" inputmode="numeric"></div></div><div class="sec-title" style="padding:4px 20px 10px">Precios por defecto</div><div class="scard"><div class="srow"><div><div class="slabel">Tratamiento anti frizz</div><div class="ssub">Precio en casa</div></div><input class="sinput" type="number" id="cfg-ker" value="'+PRECIOS.keratina+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Alisado japonés</div><div class="ssub">Precio en casa</div></div><input class="sinput" type="number" id="cfg-jap" value="'+PRECIOS.japones+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Extra sin formol</div><div class="ssub">Precio en casa</div></div><input class="sinput" type="number" id="cfg-sf" value="'+PRECIOS.sinformol+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Adicional domicilio</div><div class="ssub">Se suma al precio base</div></div><input class="sinput" type="number" id="cfg-dom" value="'+PRECIOS.dom+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Adicional nocturno</div></div><input class="sinput" type="number" id="cfg-noc" value="'+PRECIOS.nocturno+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Adicional domingo</div></div><input class="sinput" type="number" id="cfg-ddo" value="'+PRECIOS.domingo+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Extra cantidad 1</div></div><input class="sinput" type="number" id="cfg-ex1" value="'+PRECIOS.extra1+'" inputmode="numeric"></div><div class="srow"><div><div class="slabel">Extra cantidad 2</div></div><input class="sinput" type="number" id="cfg-ex2" value="'+PRECIOS.extra2+'" inputmode="numeric"></div></div><div class="sec-title" style="padding:4px 20px 10px">Datos</div><div class="scard"><div class="srow"><div><div class="slabel">Movimientos guardados</div></div><span style="color:var(--muted)">'+movs.length+'</span></div><div class="srow" id="btn-borrar" style="cursor:pointer"><div class="slabel" style="color:var(--danger)">Borrar todos los datos</div><span style="color:var(--danger)">→</span></div></div>';
+  var cfgm=document.getElementById('cfg-meta');
+  if(cfgm)cfgm.onchange=function(){metaMonto=parseFloat(this.value)||2000000;saveData();renderMeta();};
+  var ker=document.getElementById('cfg-ker');if(ker)ker.onchange=function(){PRECIOS.keratina=parseFloat(this.value)||0;saveData();};
+  var sf=document.getElementById('cfg-sf');if(sf)sf.onchange=function(){PRECIOS.sinformol=parseFloat(this.value)||0;saveData();};
+  var jap=document.getElementById('cfg-jap');if(jap)jap.onchange=function(){PRECIOS.japones=parseFloat(this.value)||0;saveData();};
+  var dom=document.getElementById('cfg-dom');if(dom)dom.onchange=function(){PRECIOS.dom=parseFloat(this.value)||0;saveData();};
+  var noc=document.getElementById('cfg-noc');if(noc)noc.onchange=function(){PRECIOS.nocturno=parseFloat(this.value)||0;saveData();};
+  var ddo=document.getElementById('cfg-ddo');if(ddo)ddo.onchange=function(){PRECIOS.domingo=parseFloat(this.value)||0;saveData();};
+  var ex1=document.getElementById('cfg-ex1');if(ex1)ex1.onchange=function(){PRECIOS.extra1=parseFloat(this.value)||0;saveData();};
+  var ex2=document.getElementById('cfg-ex2');if(ex2)ex2.onchange=function(){PRECIOS.extra2=parseFloat(this.value)||0;saveData();};
+  var bb=document.getElementById('btn-borrar');
+  if(bb)bb.onclick=function(){if(confirm('¿Borrar todos los datos? No se puede deshacer.')){movs=[];saveData();renderAll();}};
+}
+
+loadData();
+renderAll();
+</script>
+</body>
+</html>
